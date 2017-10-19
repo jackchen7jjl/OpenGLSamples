@@ -1,120 +1,61 @@
-#include "sb6.h"
-#include <math.h>
-#include <iostream>
-using namespace std;
+#include "OpenGLSampleBase.h"
 
-class my_application :public sb6::application
+class HelloOpenGL :public OpenGLSampleBase
 {
-private:
-	GLuint rendering_program;
-	GLuint vertex_arrray_object;
-
-public:
-	void render(double currentTime)
-	{			
-		const GLfloat red[] = { 0,0, 0.0, 1.0 };
-		glClearBufferfv(GL_COLOR,0,red);
-
-		glUseProgram(rendering_program);
-		
-		glDrawArrays(GL_TRIANGLES,0,3);
-	}
-
-	void shutdown()
+protected:
+	void StartUp() override
 	{
-		glDeleteVertexArrays(1, &vertex_arrray_object);
-		glDeleteProgram(rendering_program);
-	}
+		//_vertexShaderSource =
+		//"#version 430 core\n"
+		//"void main()\n"
+		//"{\n"
+		//"gl_Position = vec4(0.0, 0.0, 0.5, 1.0);\n"
+		//"}\n";
+		//
+		//_fragmentShaderSource =
+		//"#version 430 core\n"
+		//"out vec4 color;\n"
+		//"void main()\n"
+		//"{\n"
+		//"color = vec4(0.0, 0.8, 1.0, 1.0);\n"
+		//"}\n";
 
-	void startup()
-	{
-		rendering_program = compile_shaders();
-
-		const float data[] =
-		{
-			0.25,-0.25,0.5,1.0,  1.0,0.0,0.0,1.0,
-			-0.25,-0.25,0.5,1.0, 0.0,1.0,0.0,1.0,
-			0.25,0.25,0.5,1.0,   0.0,0.0,1.0,1.0
-		};
-
-		glGenVertexArrays(1, &vertex_arrray_object);
-		glBindVertexArray(vertex_arrray_object);
-
-		GLuint buffer;
-		glGenBuffers(1, &buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 32, (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 32, (void*)16);
-		glEnableVertexAttribArray(1);
-	}
-
-
-	
-	GLuint compile_shaders(void)
-	{
-		GLuint vertex_shader;
-		GLuint fragment_shader;
-		GLuint program;
-
-
-		const GLchar* vertex_shader_source =
+		_vertexShaderSource =
 			"#version 430 core\n"
-			"layout (location = 0) in vec4 position;\n"
-			"layout (location = 1) in vec4 color;\n"
-			"out vec4 vs_color;\n"
+			"const vec4 verts[3] = vec4[3](vec4(0.25, -0.25, 0.5, 1.0),vec4(-0.25, -0.25, 0.5, 1.0),vec4( 0.25, 0.25, 0.5, 1.0));\n"
 			"void main()\n"
 			"{\n"
-			"gl_Position = position;\n"
-			"vs_color = color;\n"
+			"gl_Position = verts[gl_VertexID];\n"
 			"}\n";
 
-		const GLchar* fragment_shader_source =
+		_fragmentShaderSource =
 			"#version 430 core\n"
-			"in vec4 vs_color;\n"
 			"out vec4 color;\n"
 			"void main()\n"
 			"{\n"
-			"color = vs_color;\n"
+			"color = vec4(0.0, 0.8, 1.0, 1.0);\n"
 			"}\n";
 
-	
-		vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertex_shader, 1,&vertex_shader_source, NULL);
-		glCompileShader(vertex_shader);
-		checkCompiletResult(vertex_shader);
-
-		fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-		glCompileShader(fragment_shader);
-		checkCompiletResult(fragment_shader);
-
-		program = glCreateProgram();
-		glAttachShader(program,vertex_shader);
-		glAttachShader(program,fragment_shader);
-		glLinkProgram(program);
-
-		glDeleteShader(vertex_shader);
-		glDeleteShader(fragment_shader);
-
-		return program;
+		_program = CompileShaders(_vertexShaderSource, _fragmentShaderSource);	
 	}
 
-	void checkCompiletResult(GLuint shader)
+	void Render()
 	{
-		GLint compileResult = GL_TRUE;
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &compileResult);
-		if (compileResult == GL_FALSE)
-		{
-			char szlog[1024] = { 0 };
-			GLsizei loglen = 0;
-			glGetShaderInfoLog(shader,1024,&loglen,szlog);
-			cerr << "compilete shader error: " << szlog << endl;
-		}
+		static const GLfloat red[] = { 1.0f,0.6f,0.0f,0.5f };
+		glClearBufferfv(GL_COLOR, 0, red);
+		
+		glUseProgram(_program);
+
+		//glPointSize(40.0f);
+		//glDrawArrays(GL_POINTS, 0, 1);
+
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+
+	void EndUp()
+	{
+		glDeleteProgram(_program);
 	}
 };
 
-DECLARE_MAIN(my_application);
+DECLARE_MAIN(HelloOpenGL)
