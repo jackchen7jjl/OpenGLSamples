@@ -39,7 +39,7 @@ protected:
 		_program = CompileShaders(_vertexShaderSource, _fragmentShaderSource);	
 	}
 
-	void Render()
+	void Render() override
 	{
 		static const GLfloat red[] = { 1.0f,0.6f,0.0f,0.5f };
 		glClearBufferfv(GL_COLOR, 0, red);
@@ -52,7 +52,7 @@ protected:
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 
-	void EndUp()
+	void EndUp() override
 	{
 		glDeleteProgram(_program);
 	}

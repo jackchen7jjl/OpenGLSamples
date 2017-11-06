@@ -77,3 +77,9 @@ SETUP_SAMPLE_START(HelloOpenGL)
 		HelloOpenGL/HelloOpenGL.cpp
 	)
 SETUP_SAMPLE_END(HelloOpenGL)
+
+SETUP_SAMPLE_START(PipeLine)
+	SET(SOURCE_FILES
+		PipeLine/PipeLine.cpp
+	)
+SETUP_SAMPLE_END(PipeLine)
